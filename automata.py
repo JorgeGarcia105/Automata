@@ -11,23 +11,11 @@ class ExpresionRegular:
         self.expresion = expresion
 
     def convertir_a_automata(self):
-        estados = set()
+        estados = {0, 1}
         alfabeto = {'a', 'b'}
-        transiciones = {}
-        estado_inicial = None
-        estados_aceptacion = set()
-
+        transiciones = {(0, 'a'): {1}, (1, 'b'): {0}}  # Ejemplo simple de transiciones
         estado_inicial = 0
-        estados.add(estado_inicial)
-        estados_aceptacion.add(estado_inicial)
-        transiciones[(estado_inicial, 'ε')] = {1}
-        transiciones[(1, 'ε')] = {estado_inicial}
-
-        # Agregar transiciones ε adicionales si es necesario
-        for estado in estados:
-            if (estado, 'ε') not in transiciones:
-                transiciones[(estado, 'ε')] = set()
-
+        estados_aceptacion = {1}
         return Automata(estados, alfabeto, transiciones, estado_inicial, estados_aceptacion)
 
 class Automata:
@@ -47,6 +35,14 @@ class Automata:
                 return False
         return estado_actual in self.estados_aceptacion
 
+    def es_determinista(self):
+        # Comprobamos si hay más de una transición posible para un estado y un símbolo dado
+        for estado in self.estados:
+            for simbolo in self.alfabeto:
+                if len(self.transiciones.get((estado, simbolo), [])) > 1:
+                    return False
+        return True
+
     def graficar(self, master):
         G = nx.DiGraph()
 
@@ -63,7 +59,7 @@ class Automata:
 
         fig, ax = plt.subplots()
         pos = nx.spring_layout(G)
-        labels = {(origen, destino): simbolo for (origen, simbolo, destino) in G.edges(data='simbolo')}
+        labels = {estado: estado for estado in G.nodes()}  # Utilizar los estados como etiquetas
         aceptacion = {estado: estado for estado, aceptacion in nx.get_node_attributes(G, 'aceptacion').items() if aceptacion}
         nx.draw(G, pos, with_labels=True, labels=labels, node_color='skyblue', node_size=1500, ax=ax)
         nx.draw_networkx_nodes(G, pos, nodelist=aceptacion.keys(), node_color='salmon', node_size=1500, ax=ax)
@@ -126,8 +122,11 @@ class Aplicacion:
             self.controlador.ingresar_expresion(expresion)
             automata = self.controlador.obtener_automata()
             if automata:
-                self.mostrar_automata(automata)
-                automata.graficar(self.root)
+                if automata.es_determinista():
+                    self.mostrar_automata(automata)
+                    automata.graficar(self.root)
+                else:
+                    messagebox.showerror("Error", "El autómata generado no es determinista.")
             else:
                 messagebox.showerror("Error", "La expresión regular no es válida.")
         else:
@@ -142,6 +141,7 @@ class Aplicacion:
                     messagebox.showinfo("Resultado", "La cadena es aceptada por el autómata.")
                 else:
                     messagebox.showinfo("Resultado", "La cadena no es aceptada por el autómata.")
+                    print("La cadena no es aceptada por el autómata.")
             else:
                 messagebox.showerror("Error", "Debe ingresar una expresión regular primero.")
         else:
@@ -153,7 +153,8 @@ class Aplicacion:
             print("Alfabeto:", automata.alfabeto)
             print("Transiciones:")
             for transicion, destino in automata.transiciones.items():
-                print(transicion, "->", destino)
+                print(transicion)
+                print(" -> ", destino)
             print("Estado inicial:", automata.estado_inicial)
             print("Estados de aceptación:", automata.estados_aceptacion)
         else:
@@ -163,4 +164,12 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.title("Aplicación de Expresiones Regulares y Autómatas")
     app = Aplicacion(root)
+
+    # Valores de prueba
+    expresion_prueba = "(a|b)*abb"
+    cadena_prueba = "abbb"
+
+    app.entry_expresion.insert(0, expresion_prueba)
+    app.entry_cadena.insert(0, cadena_prueba)
+
     root.mainloop()

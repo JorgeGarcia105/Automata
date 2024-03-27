@@ -1,10 +1,10 @@
 digraph {
-	0 [shape=circle]
-	1 [shape=circle]
-	2 [shape=circle]
-	3 [shape=doublecircle]
-	0 -> 0 [label=a]
-	1 -> 1 [label=b]
-	2 -> 2 [label=c]
-	2 -> 3 [label="ε"]
+	q1
+	q2 [shape=doublecircle]
+	q0
+	"" -> q0
+	q0 -> q1 [label=a]
+	q1 -> q1 [label=a]
+	q1 -> q2 [label=b]
+	q2 -> q2 [label=b]
 }

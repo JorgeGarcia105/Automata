@@ -1,3 +1,6 @@
+from graphviz import Digraph
+import os
+
 class AutomataDeterminista:
     def __init__(self, estados, alfabeto, transiciones, estado_inicial, estados_aceptacion):
         self.estados = estados
@@ -16,6 +19,24 @@ class AutomataDeterminista:
                 return False  # No hay transición para el símbolo actual
         return estado_actual in self.estados_aceptacion
 
+    def graficar(self):
+        dot = Digraph(executable="C:/Program Files/Graphviz/bin/dot.exe")  # Ruta al ejecutable dot en tu sistema
+
+        for estado in self.estados:
+            if estado in self.estados_aceptacion:
+                dot.node(estado, shape='doublecircle')
+            else:
+                dot.node(estado)
+
+        dot.edge('', self.estado_inicial)
+
+        for transicion, destino in self.transiciones.items():
+            origen, simbolo = transicion
+            dot.edge(origen, destino, label=simbolo)
+
+        dot.render('automata', format='png', cleanup=True)
+        print("Se ha generado el archivo 'automata.png'.")
+
 # Ejemplo de uso
 if __name__ == "__main__":
     # Definición del autómata
@@ -32,8 +53,5 @@ if __name__ == "__main__":
 
     afd = AutomataDeterminista(estados, alfabeto, transiciones, estado_inicial, estados_aceptacion)
 
-    # Prueba con cadenas
-    cadena1 = "ab"
-    cadena2 = "aaaab"
-    print(f"¿'{cadena1}' es aceptada? {afd.procesar_cadena(cadena1)}")
-    print(f"¿'{cadena2}' es aceptada? {afd.procesar_cadena(cadena2)}")
+    # Graficar el autómata
+    afd.graficar()
