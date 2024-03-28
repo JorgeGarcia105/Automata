@@ -1,5 +1,4 @@
 from graphviz import Digraph
-import os
 
 class AutomataDeterminista:
     def __init__(self, estados, alfabeto, transiciones, estado_inicial, estados_aceptacion):
@@ -34,27 +33,31 @@ class AutomataDeterminista:
             origen, simbolo = transicion
             dot.edge(origen, destino, label=simbolo)
 
-        dot.render('automata', format='png', cleanup=True)
-        print("Se ha generado el archivo 'automata.png'.")
+        dot.render('automata2', format='png', cleanup=True)
+        print("Se ha generado el archivo 'automata2.png'.")
 
-def leer_dfa(nombre_archivo):
-    with open(nombre_archivo, 'r') as file:
-        estados = set(file.readline().strip().split(','))
-        alfabeto = set(file.readline().strip().split(','))
-        estado_inicial = file.readline().strip()
-        estados_aceptacion = set(file.readline().strip().split(','))
+def leer_dfa_desde_entrada():
+    print("Ingrese los detalles del DFA:")
+    estados = set(input("Estados (separados por comas): ").strip().split(','))
+    alfabeto = set(input("Alfabeto (separado por comas): ").strip().split(','))
+    estado_inicial = input("Estado inicial: ").strip()
+    estados_aceptacion = set(input("Estados de aceptación (separados por comas): ").strip().split(','))
 
-        transiciones = {}
-        for line in file:
-            origen, simbolo, destino = line.strip().split(',')
-            transiciones[(origen, simbolo)] = destino
+    transiciones = {}
+    while True:
+        transicion = input("Ingrese una transición como 'estado_actual,símbolo,estado_siguiente' (o 'fin' para terminar): ").strip()
+        if transicion.lower() == 'fin':
+            break  # Sale del bucle mientras
+        origen, simbolo, destino = transicion.split(',')
+        transiciones[(origen, simbolo)] = destino
 
     return AutomataDeterminista(estados, alfabeto, transiciones, estado_inicial, estados_aceptacion)
 
+
 # Ejemplo de uso
 if __name__ == "__main__":
-    # Leer DFA desde un archivo
-    dfa = leer_dfa("dfa.txt")
+    # Leer DFA desde la entrada del usuario
+    dfa = leer_dfa_desde_entrada()
 
     # Graficar el autómata
     dfa.graficar()
