@@ -1,4 +1,5 @@
 from graphviz import Digraph
+import re
 
 class AutomataDeterminista:
     def __init__(self, estados, alfabeto, transiciones, estado_inicial, estados_aceptacion):
@@ -19,7 +20,7 @@ class AutomataDeterminista:
         return estado_actual in self.estados_aceptacion
 
     def graficar(self):
-        dot = Digraph()  # No need for the 'executable' parameter here
+        dot = Digraph()
 
         for estado in self.estados:
             if estado in self.estados_aceptacion:
@@ -33,31 +34,33 @@ class AutomataDeterminista:
             origen, simbolo = transicion
             dot.edge(origen, destino, label=simbolo)
 
-        dot.render('automata2', format='png', cleanup=True)
-        print("Se ha generado el archivo 'automata2.png'.")
+        dot.render('automata', format='png', cleanup=True)
+        print("Se ha generado el archivo 'automata.png'.")
 
 def leer_dfa_desde_entrada():
-    print("Ingrese los detalles del DFA:")
-    estados = set(input("Estados (separados por comas): ").strip().split(','))
-    alfabeto = set(input("Alfabeto (separado por comas): ").strip().split(','))
-    estado_inicial = input("Estado inicial: ").strip()
-    estados_aceptacion = set(input("Estados de aceptación (separados por comas): ").strip().split(','))
+    # Definir detalles del DFA
+    estados = {'q0', 'q1', 'q2'}
+    alfabeto = {'0', '1'}
+    estado_inicial = 'q0'
+    estados_aceptacion = {'q2'}
 
-    transiciones = {}
-    while True:
-        transicion = input("Ingrese una transición como 'estado_actual,símbolo,estado_siguiente' (o 'fin' para terminar): ").strip()
-        if transicion.lower() == 'fin':
-            break  # Sale del bucle mientras
-        origen, simbolo, destino = transicion.split(',')
-        transiciones[(origen, simbolo)] = destino
+    # Definir las transiciones del DFA
+    transiciones = {
+        ('q0', '0'): 'q1',
+        ('q0', '1'): 'q0',
+        ('q1', '0'): 'q2',
+        ('q1', '1'): 'q0',
+        ('q2', '0'): 'q2',
+    }
 
     return AutomataDeterminista(estados, alfabeto, transiciones, estado_inicial, estados_aceptacion)
 
-
-# Ejemplo de uso
-if __name__ == "__main__":
+def main():
     # Leer DFA desde la entrada del usuario
     dfa = leer_dfa_desde_entrada()
 
     # Graficar el autómata
     dfa.graficar()
+
+if __name__ == "__main__":
+    main()

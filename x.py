@@ -5,6 +5,7 @@ from graphviz import Digraph
 
 class Modelo:
     def __init__(self):
+        # Inicializar el modelo
         pass
 
     def generar_automata(self, expresion_regular):

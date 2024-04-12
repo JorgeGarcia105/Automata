@@ -35,7 +35,7 @@ class AutomataDeterminista:
             dot.edge(origen, destino, label=simbolo)
 
         dot.render('automata', format='png', cleanup=True)
-        print("Se ha generado el archivo 'automata.png'.")
+        print("Se ha generado el archivo 'automata5.png'.")
 
 def leer_dfa(nombre_archivo):
     with open(nombre_archivo, 'r') as file:
